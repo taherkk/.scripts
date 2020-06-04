@@ -1,0 +1,13 @@
+#!/bin/bash
+if [[ ${@:1:1} == max ]];then
+  pulsemixer --set-volume-all 150:150
+  pkill -RTMIN+10 i3blocks
+elif [[ ${@:1:1} == mid ]];then
+  pulsemixer --set-volume-all 100:100
+  pkill -RTMIN+10 i3blocks
+elif [[ ${@:1:1} == min ]];then
+  pulsemixer --set-volume-all 50:50
+  pkill -RTMIN+10 i3blocks
+else
+  echo Enter a valid argument[min/mid/max]
+fi

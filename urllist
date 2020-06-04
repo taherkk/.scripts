@@ -1,0 +1,16 @@
+#!/usr/bin/python3
+
+import pyperclip,shelve,sys
+
+mcbShelf = shelve.open('mcb')
+
+if sys.argv[1] == 'new':
+  mcbShelf['url_list'] = ''
+elif sys.argv[1] == 'add':
+  urls=mcbShelf['url_list'].split()
+  if str(pyperclip.paste()) not in urls:
+    mcbShelf['url_list']=mcbShelf['url_list']+str(pyperclip.paste())+' '
+elif sys.argv[1] == 'get':
+  pyperclip.copy(str(mcbShelf['url_list']))
+elif sys.argv[1] == 'getlast':
+  pyperclip.copy(mcbShelf['url_list'].split()[-1])

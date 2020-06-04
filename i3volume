@@ -1,0 +1,17 @@
+#!/bin/bash
+
+vol=$(pulsemixer --get-volume | awk '{ print $1 }')
+
+if [[ ($vol -gt 0) && ($vol -le 50) ]];then
+  echo 🔈 $vol
+  echo 🔈 $vol
+elif [[ ($vol -le 100) && ($vol -gt 50) ]];then
+  echo 🔉 $vol
+  echo 🔉 $vol
+elif [[ ($vol -gt 100) && ($vol -le 150) ]];then
+  echo 🔊 $vol
+  echo 🔊 $vol
+else
+  echo 🔇
+  echo 🔇
+fi

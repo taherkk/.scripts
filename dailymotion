@@ -1,0 +1,2 @@
+#!/bin/bash
+youtube-dl $@ -c -o "~/youtube-dl/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'

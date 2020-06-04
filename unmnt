@@ -1,0 +1,21 @@
+#!/bin/bash
+
+blks=$(lsblk -o "name,label,fstype,type,size,mountpoint")
+
+mounted=$( mount | grep /home/taher/mnt | awk '{ print $1 }' | sed -e 's/\/dev\///' )
+disks=$( echo "$blks" | grep "$mounted" )
+#testing=$( lsblk -o "name,label" )
+#echo "$testing"
+
+if [[ -z "$disks" ]]
+then
+  echo "There are no disks to be mounted"
+  exit 1
+else
+  echo "$( echo "$blks" | head -n 1 )"
+  echo
+  echo "$disks"
+  echo
+  read -p "Disk to unmount (Enter the name): " disk
+  sudo umount /dev/$disk
+fi

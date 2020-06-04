@@ -1,0 +1,21 @@
+#!/bin/bash
+
+disk=$1
+newlabel=$2
+
+disks=`lsblk -po "name,label,fstype,type,size,mountpoint"`
+echo "$disks"
+
+fs=$( echo "$disks" | grep $disk | awk '{print $2}' )
+echo $fs
+
+case "$fs" in
+  ext*) tool="e2label" ;;
+  fat) tool="fatlabel" ;;
+  vfat) tool="fatlabel" ;;
+  exfat) tool="extfatlabel" ;;
+  ntfs) tool="ntfslabel" ;;
+  *) ;;
+esac
+
+sudo $tool /dev/$disk $newlabel

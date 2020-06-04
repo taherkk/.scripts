@@ -1,0 +1,92 @@
+#!/bin/bash
+
+iter=1
+outdir=$HOME/youtube-dl/
+url=${@: -1}
+
+# Checking for the default directory
+[[ -d $outdir ]] && : || mkdir $outdir
+
+# Checking url correctness
+if [[ -z $url || $url != http* ]];then
+  echo "Invalid URL"
+
+# Single file {{{
+elif [[ ${@:1:1} == vi ]];then #{{{
+  echo Getting media download options.
+  choice=`youtube-dl -F --no-playlist $url | grep -E '\(best\)' | awk '{print $1}' | head -n 1`
+  echo Code selected: $choice
+  youtube-dl -f $choice ${@: 2}  --no-playlist -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  #}}}
+
+elif [[ ${@:1:1} == au ]];then #{{{
+  echo Getting media download options.
+  choice=`youtube-dl -F --no-playlist $url | grep -E 'm4a' |  awk '{print $1}' | tail -n 1`
+  echo Code selected: $choice
+  youtube-dl -f $choice ${@: 2} --no-playlist -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  #}}}
+  #}}}
+
+# Playlist {{{
+elif [[ ${@:1:1} =~ pl* ]];then
+  # Getting playlist name {{{
+  read -p "Enter the playlist name: " pldir 
+  outdir=$outdir$pldir
+  [[ ! -d $outdir ]] && mkdir $outdir
+  [[ -d $outdir ]] && echo "outdir = $outdir"
+  #}}}
+  
+  # Creating fileformat.txt if it does not exist {{{
+  if ! [[ -e $outdir/fileformat.txt ]]; then
+    echo Creating fileformat.txt.
+    touch $outdir/fileformat.txt
+  fi
+  #}}}
+  
+  # Writing fileformat.txt {{{
+  if [[ $(tail -n 1 $outdir/fileformat.txt) != $url ]];then
+    echo Getting media download options.
+    echo $url > $outdir/fileformat.txt
+    youtube-dl -F $url >> $outdir/fileformat.txt
+    echo $url >> $outdir/fileformat.txt
+  fi
+  #}}}
+  
+  # Choosing audio or video {{{
+  if [[ ${@:1:1} == pl-au ]];then
+    echo Choice: audio
+    choice="m4a"
+  elif [[ ${@:1:1} == pl-vi ]];then
+    echo Choice: video
+    choice="\(best\)"
+  else
+    echo 'Please mention audio or video in the first augument: pl-[au|vi]'
+    exit
+  fi
+  #}}}
+  
+  # Getting codes for each file and setting padding {{{
+  codes=$(cat $outdir/fileformat.txt | grep -e "$choice" | awk '{ print $1 }')
+  echo codes=$codes
+  padding0=$(echo "$codes" | wc -w)
+  padding2=${#padding0}
+  #}}}
+
+  # Satisfying directory requirements and downloading the files {{{
+  echo Starting Download...
+  echo
+  for i in ${codes[@]};do
+    playlistindex=$(printf "%0$(echo $padding2)g" $iter)
+    youtube-dl -f $i --playlist-items $iter ${@:2} -c -o "$outdir/$(echo $playlistindex)-%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+    iter=$(( $iter + 1 ))
+  done
+  #}}} 
+#}}}
+
+  # Custom choice {{{
+else
+  youtube-dl -F $url
+  read -p "Enter your choice: " choice
+  youtube-dl -f $choice ${@: 1} -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+fi
+#}}}

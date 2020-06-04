@@ -1,0 +1,25 @@
+#!/bin/bash
+
+option=$1
+filename=$2
+notesdir=~/Dropbox/NOTES/
+notelinkdir=~/Notes/
+confirmation="I am sure I want to delete this note"
+
+getNote(){
+	echo "$(echo -e "$(ls $notelinkdir)" | dmenu -l 10 -p "Select Note: ")"
+}
+
+if [[ $option == -c || $option == create ]];then
+	touch $notesdir$filename
+	ln -s $notesdir$filename $notelinkdir
+elif [[ $option == -d || $option == delete ]];then
+	note=$(getNote)
+	if [[ ! -z $note ]];then
+		mv $notesdir$note ~/.trash/
+		rm $notelinkdir$note 
+	fi
+elif [[ $option == -o ]];then
+	note=$(getNote)
+	[[ ! -z $note ]] && st -e nvim "$notelinkdir$note"
+fi

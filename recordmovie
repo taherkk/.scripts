@@ -1,0 +1,8 @@
+#!/bin/bash
+
+A="$(pacmd list-sources | grep -PB 1 "analog.*monitor>" | head -n 1 | awk '{print $2}')"
+V="$(xdpyinfo | grep dimensions | awk '{print $2;}')"
+
+read -p "Enter the file name: " F
+
+[[ ! -z $F ]] && ffmpeg -loglevel error -video_size "$V" -f x11grab -i :0.0 -f pulse -i "$A" -f pulse -i default -filter_complex amerge -ac 2 -preset veryfast "$F" || :

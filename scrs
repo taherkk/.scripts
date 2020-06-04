@@ -1,0 +1,17 @@
+#!/bin/bash
+
+screenshot(){
+  scrot $@ -e 'mv $f ~/Pictures/screenshots'
+}
+
+[[ -z $1 ]] && choice=$(echo -e "Fullscreen\nWindow\nSelect" | dmenu -p "Select choice:" )
+options="-q 100"
+
+if [[ $1 == -f || $1 == "Fullscreen" ]];then
+  screenshot $options
+elif [[ $1 == -w || $choice == "Window" ]];then
+  screenshot -u $options
+elif [[ $1 == -s || $choice == "Select" ]];then
+  screenshot -s $options
+fi
+

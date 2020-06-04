@@ -1,0 +1,29 @@
+#!/bin/bash
+
+tapchange(){
+  xinput set-prop $device $prop $1
+}
+
+device=`xinput | grep -Po "Synaptics TouchPad\s+id=\K[\d]+"`
+prop=`xinput --list-props $device | grep -Po 'Tapping Enabled \(\K[\d]+'`
+deviceStatus=$(xinput --list-props $device | awk '/Device Enabled/ {print $4}' | head -n 1)
+
+[[ -z $1 ]] && choice=$(echo -e "enable\ndisable" | dmenu -p "Select choice: " ) || choice=$1
+
+if [[ $choice == enable || $1 == -e ]];then
+  xinput --enable $device
+  tapchange 1
+elif [[ $choice == disable || $1 == -d ]];then
+  xinput --disable $device
+elif [[ $choice == toggle || $1 == -t ]];then
+  if [[ $deviceStatus == 1 ]];then
+    xinput --disable $device
+  else
+    xinput --enable $device
+    tapchange 1
+  fi
+elif [[ $choice == refresh || $1 == -r ]];then
+  xinput --disable $device
+  xinput --enable $device
+  tapchange 1
+fi

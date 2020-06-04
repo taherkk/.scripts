@@ -1,0 +1,18 @@
+#!/bin/bash
+connection=$(ip a | grep "state UP" | awk '{print $2}' | sed -e 's/\(.*\):/\1/')
+server=$(echo -e "homecloud\nwordpress" | dmenu -p "Select server: ")
+if [[ $connection == wlp2s0 ]];then
+  wifi=$(nmcli connection show --active | grep wlp2s0 | awk '{print $1}')
+fi
+if [[ $server == homecloud ]];then
+  filezilla ftp://homecloud:homecloud@192.168.1.10 -a $HOME/ &
+elif [[ $1 == wordpress ]];then
+  filezilla ftp://u287684137.taher:Taher\@123@ftp.generictechie.com -a $HOME &
+else 
+  internet wifi
+  read -p "Username: " username
+  read -p "Password: " password
+  read -p "URL Address: " address
+  read -p "Port: " port
+  filezilla ftp://$username:$password@$address:$port -a $HOME/ &
+fi

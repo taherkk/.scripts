@@ -1,0 +1,25 @@
+#!/bin/bash
+
+NUM=`cat /sys/class/power_supply/BAT0/capacity` || exit
+STATUS=`cat /sys/class/power_supply/BAT0/status|sed 's/.//2g'`
+[[ $STATUS == C ]] && STATUS=🔌 || STATUS=🔋
+
+if [[ $NUM -ge 100 ]];then
+  echo $STATUS: "100"%
+  echo $STATUS: "100"%
+else
+  echo $STATUS: "$NUM"%
+  echo $STATUS: "$NUM"%
+fi
+  
+if [ "$NUM" -ge 80 ]; then
+  echo "#00ff00"
+elif [ "$NUM" -ge 60 ]; then
+	echo "#c5ff00"
+elif [ "$NUM" -ge 40 ]; then
+	echo "#eeff00"
+elif [ "$NUM" -ge 20 ]; then
+	echo "#FFa000"
+else
+	echo "#ffc000"
+fi
