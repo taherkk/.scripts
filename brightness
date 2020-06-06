@@ -1,44 +1,39 @@
 #!/bin/bash
 
+# initializing variables {{{
 multiply_factor=44
 current_brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
 max_brightness=$(cat /sys/class/backlight/intel_backlight/max_brightness)
 current_level=$(( $current_brightness / $multiply_factor ))
 max_level=$(($max_brightness / $multiply_factor))
+brightness=0
+#}}}
 
-set_brightness() {
+set_brightness() { #{{{
   # To check if brightness is not equal to zero or greater than maximum limit
   [[ $1 -gt 0 && $1 -le $max_brightness ]] && echo "$1" > /sys/class/backlight/intel_backlight/brightness || echo Brightness too low.
   pkill -RTMIN+11 i3blocks
-}
+} #}}}
 
-# initializing the brightness variable to zero
-brightness=0
 # set the brightness at a certain level
 if [[ $1 == 'set' ]];then
-  brightness=$(( $multiply_factor + ($multiply_factor * $2) ))
+  brightness=$(( $multiply_factor * $2 ))
   set_brightness "$brightness"
+
 # Increment or decrement brightness
 elif [[ $1 =~ -?[0-9]+ ]];then 
+  # set brightness to 1 if current_level bet. 0 and multiply_factor and decrementing
   if [[ $1 -lt 0 && $current_level -le $(( $1 * -1 )) && $current_level -gt 1 ]];then
     brightness=$multiply_factor
-    echo error1
-  elif [[ $current_level -ge 0 && $current_level -lt $1 && $1 -gt 0 ]];then
-    brightness=$(( $multiply_factor * $1 ))
-    echo error2
-  elif [[ $current_level -gt $(( $max_level - $1 )) ]];then
-    brightness=$max_brightness
-    echo error3
+  # If brightness is less than or equal to 1 and decrementing then step down by 1/4 of multiply_factor untill current_brightness becomes 0
   elif [[ $current_level -le 1 && $1 -lt 0 ]];then
     brightness=$(($current_brightness - $(printf "%.0f" $(echo "0.25*$multiply_factor" | bc))))
-    echo error4
+  # If brightness is equal to 0 and incrementing then step up by 2/4 of multiply_factor untill current_brightness becomes equal to 1
   elif [[ $current_level == 0 ]];then
     brightness=$(($current_brightness + $(printf "%.0f" $(echo "0.25*$multiply_factor" | bc))))
-    echo error5
   else
     # Uses signed value to increment or decrement the brightness (also accepts floating point values) 
-    brightness=$((($current_level*$multiply_factor)+ $(printf "%.0f" $(echo "$1*$multiply_factor" | bc))))
-    echo error6
+    brightness=$((($current_brightness - ($current_brightness % ($multiply_factor * $1)))+ $(printf "%.0f" $(echo "$1*$multiply_factor" | bc))))
   fi
   set_brightness $brightness
 else
