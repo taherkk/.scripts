@@ -31,12 +31,17 @@ elif [[ $1 =~ -?[0-9]+ ]];then
   # If brightness is equal to 0 and incrementing then step up by 2/4 of multiply_factor untill current_brightness becomes equal to 1
   elif [[ $current_level == 0 ]];then
     brightness=$(($current_brightness + $(printf "%.0f" $(echo "0.25*$multiply_factor" | bc))))
+  elif [[ $current_level == 1 && $current_level -lt $1 ]];then
+    brightness=$(($1 * $multiply_factor))
+  # set brightness to max if max_level - current_level is less than the increment
+  elif [[ $(( $max_level - $current_level )) -lt $1 ]];then
+    brightness=$max_brightness
   else
     # Uses signed value to increment or decrement the brightness (also accepts floating point values) 
-    brightness=$((($current_brightness - ($current_brightness % ($multiply_factor * $1)))+ $(printf "%.0f" $(echo "$1*$multiply_factor" | bc))))
+    brightness=$((($current_brightness + $(printf "%.0f" $(echo "$1*$multiply_factor" | bc)))))
   fi
   set_brightness $brightness
 else
   echo Current brightness: $(cat /sys/class/backlight/intel_backlight/brightness)
-  echo 'Current level : ' $(( $current_level * ($multiply_factor / 44) ))
+  echo 'Current level : ' $current_level
 fi
