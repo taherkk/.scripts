@@ -98,7 +98,6 @@ elif [[ $1 == refresh ]];then
   fi
 
 elif [[ $1 == wifi ]];then
-  nmcli dev disconnect enp3s0
   nmcli radio wifi on
   # Sometimes the wifi gets connected to a network which is preconfigured, automatically
   sleep 6
