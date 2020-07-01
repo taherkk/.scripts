@@ -24,37 +24,36 @@ def isHijriLeapYear(year):
     return True
 
 
-def getNumberOfGregDays(date, curDate):
+def getNumberOfGregDays(refGregDate, curGregDate):
 
-    startMonth = date['month']
-    endMonth = curDate['month']
-    startYear = date['year']
-    endYear = curDate['year']
+    startMonth = refGregDate['month']
+    endMonth = curGregDate['month']
+    startYear = refGregDate['year']
+    endYear = curGregDate['year']
     days = 0
 
     if (startYear <= endYear and startMonth <= endMonth):
-        # Adding the remaining days of the month of the recorded date
-        # For the same years and months
+        # Adding the remaining days of the month of the reference date
         if(startYear == endYear and startMonth == endMonth):
-            return curDate['day'] - date['day']
+            return curGregDate['day'] - refGregDate['day']
         else:
             # For the different years and different months
-            days = gregMonthDays[date['month']]-date['day']
+            days = gregMonthDays[refGregDate['month']]-refGregDate['day']
 
         # Adding days of the current month
         if startMonth != endMonth or (startMonth == endMonth and startYear < endYear):
-            days = days + curDate['day']
-        startMonth = startMonth + 1
+            days = days + curGregDate['day']
+        startMonth += 1
 
-    # To add the days of the months between the starting and the ending months.
+    # To add the days of the months between the starting and the ending years and months.
     while (startYear <= endYear and startMonth < endMonth) or startYear < endYear:
         days = days + gregMonthDays[startMonth]
         if(startMonth == 2 and isGregLeapYear(int(startYear))):
             days = days+1
         if startMonth == 12:
             startMonth = 0
-            startYear = startYear + 1
-        startMonth = startMonth + 1
+            startYear += 1
+        startMonth += 1
 
     return days
 
@@ -68,31 +67,27 @@ def getHijriDaysInAMonth(month, year):
         return hijriMonthDays[month % 2]
 
 
-def calhijri(hijri, days):
-    day = hijri['day']
-    month = hijri['month']
-    year = hijri['year']
+def calhijri(refHijriDate, gregdays):
+    day = refHijriDate['day']
+    month = refHijriDate['month']
+    year = refHijriDate['year']
     daysInMonth = None
     if isHijriLeapYear(year) and month == 12:
         daysInMonth = 30
     else:
         daysInMonth = hijriMonthDays[month % 2]
-    while days:
+    while gregdays:
         if day == daysInMonth:
             day = 1
             if month == 12:
                 month = 1
-                year = year + 1
+                year += 1
             else:
-                month = month + 1
+                month += 1
             daysInMonth = getHijriDaysInAMonth(month, year)
-            # if isHijriLeapYear(year) and month == 12:
-            #    daysInMonth = 30
-            # else:
-            #    daysInMonth = hijriMonthDays[month % 2]
         else:
-            day = day + 1
-        days = days - 1
+            day += 1
+        gregdays -= 1
     return {'day': day, 'month': month, 'year': year}
 
 # ض ص ث ق ف غ ع ه خ ح ج چ
@@ -142,17 +137,17 @@ def convertMonth(num):
     return month[num]
 
 
-def gregToHijri(date):
+def gregToHijri(refdate):
     curDate = datetime.datetime.now()
     curGregDate = {
         'day': curDate.day,
         'month': curDate.month,
         'year': curDate.year
     }
-    gregDate = date['gregorian']
-    hijriDate = date['hijri']
-    days = getNumberOfGregDays(gregDate, curGregDate)
-    curHijriDate = calhijri(hijriDate, days)
+    refGregDate = refdate['gregorian']
+    refHijriDate = refdate['hijri']
+    gregDays = getNumberOfGregDays(refGregDate, curGregDate)
+    curHijriDate = calhijri(refHijriDate, gregDays)
     return (curHijriDate, curDate.hour)
 
 
@@ -165,11 +160,13 @@ def getHijriDay(hijri, hour):
             daysInMonth = getHijriDaysInAMonth(hijri['month']+1, hijri['year'])
         else:
             day = hijri['day'] + 1
+    else:
+        day = hijri['day']
     return convertNumbers(day)+"/"+convertNumbers(daysInMonth)
 
 
 def getHijriMonth(month):
-    return convertNumbers(month)+"/"+convertMonth(month)[::-1]
+    return convertMonth(month)[::-1]+"/"+convertNumbers(month)
 
 
 def getHijriYear(year):
@@ -179,7 +176,7 @@ def getHijriYear(year):
 def getHijriDate():
     hijri, hour = gregToHijri(refDate)
     dateFormat = getHijriDay(
-        hijri, hour)+" "+getHijriMonth(hijri['month'])+" "+getHijriYear(hijri['year'])+"هـ"
+        hijri, hour)+"  "+getHijriMonth(hijri['month'])+" "+getHijriYear(hijri['year'])+"هـ"
     return dateFormat
 
 
