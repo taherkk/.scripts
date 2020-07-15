@@ -1,8 +1,22 @@
 #!/bin/bash
 
-iter=1
-outdir=$HOME/youtube-dl/
-url=${@: -1}
+basedir=$HOME/youtube-dl/
+outdir=$basedir
+url=""
+format=""
+options=""
+
+while getopts "d:u:f:o:" arg; do
+  case $arg in
+    d) outdir=$basedir$OPTARG;;
+    u) url=$OPTARG;;
+    f) format=$OPTARG;; 
+    o) options=\"$OPTARG\";;
+  esac
+  echo -e $OPTARG
+done
+
+echo $url
 
 # Checking for the default directory
 [[ -d $outdir ]] && : || mkdir $outdir
@@ -12,23 +26,23 @@ if [[ -z $url || $url != http* ]];then
   echo "Invalid URL"
 
 # Single file {{{
-elif [[ ${@:1:1} == vi ]];then #{{{
+elif [[ $format == vi ]];then #{{{
   echo Getting media download options.
   choice=`youtube-dl -F --no-playlist $url | grep -E '\(best\)' | awk '{print $1}' | head -n 1`
   echo Code selected: $choice
-  youtube-dl -f $choice ${@: 2}  --no-playlist -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  youtube-dl -f $choice $url $options --no-playlist -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
   #}}}
 
-elif [[ ${@:1:1} == au ]];then #{{{
+elif [[ $format == au ]];then #{{{
   echo Getting media download options.
   choice=`youtube-dl -F --no-playlist $url | grep -E 'm4a' |  awk '{print $1}' | tail -n 1`
   echo Code selected: $choice
-  youtube-dl -f $choice ${@: 2} --no-playlist -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  youtube-dl -f $choice $url $options --no-playlist -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
   #}}}
   #}}}
 
 # Playlist {{{
-elif [[ ${@:1:1} =~ pl* ]];then
+elif [[ $format =~ ^pl* ]];then
   # Getting playlist name {{{
   read -p "Enter the playlist name: " pldir 
   outdir=$outdir$pldir
@@ -53,10 +67,10 @@ elif [[ ${@:1:1} =~ pl* ]];then
   #}}}
   
   # Choosing audio or video {{{
-  if [[ ${@:1:1} == pl-au ]];then
+  if [[ $format == pl-au ]];then
     echo Choice: audio
     choice="m4a"
-  elif [[ ${@:1:1} == pl-vi ]];then
+  elif [[ $format == pl-vi ]];then
     echo Choice: video
     choice="\(best\)"
   else
@@ -75,9 +89,10 @@ elif [[ ${@:1:1} =~ pl* ]];then
   # Satisfying directory requirements and downloading the files {{{
   echo Starting Download...
   echo
+  iter=1
   for i in ${codes[@]};do
     playlistindex=$(printf "%0$(echo $padding2)g" $iter)
-    youtube-dl -f $i --playlist-items $iter ${@:2} -c -o "$outdir/$(echo $playlistindex)-%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+    youtube-dl -f $i --playlist-items $iter $url $options -c -o "$outdir/$(echo $playlistindex)-%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
     iter=$(( $iter + 1 ))
   done
   #}}} 
@@ -87,6 +102,6 @@ elif [[ ${@:1:1} =~ pl* ]];then
 else
   youtube-dl -F $url
   read -p "Enter your choice: " choice
-  youtube-dl -f $choice ${@: 1} -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  youtube-dl -f $choice $url $options -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 fi
 #}}}
