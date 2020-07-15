@@ -13,10 +13,7 @@ while getopts "d:u:f:o:" arg; do
     f) format=$OPTARG;; 
     o) options=\"$OPTARG\";;
   esac
-  echo -e $OPTARG
 done
-
-echo $url
 
 # Checking for the default directory
 [[ -d $outdir ]] && : || mkdir $outdir
