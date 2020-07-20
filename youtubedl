@@ -1,19 +1,11 @@
 #!/bin/bash
 
+# Initial Setup {{{
 basedir=$HOME/youtube-dl/
 outdir=$basedir
 url=""
 format=""
 options=""
-
-while getopts "d:u:f:o:" arg; do
-  case $arg in
-    d) outdir=$basedir$OPTARG;;
-    u) url=$OPTARG;;
-    f) format=$OPTARG;; 
-    o) options=$OPTARG;;
-  esac
-done
 
 # Checking for the default directory
 [[ -d $outdir ]] && : || mkdir $outdir
@@ -21,6 +13,20 @@ done
 # Checking url correctness
 if [[ -z $url || $url != http* ]];then
   echo "Invalid URL"
+
+#}}}
+
+# Arguments {{{
+while getopts "d:u:f:o:" arg; do
+  case $arg in
+    d) outdir=$basedir$OPTARG;;
+    u) url=$OPTARG;;
+    f) format=$OPTARG;; 
+    o) options=$OPTARG;;
+  esac
+  echo $OPTARG
+done
+#}}}
 
 # Single file {{{
 elif [[ $format == vi ]];then #{{{
@@ -39,7 +45,9 @@ elif [[ $format == au ]];then #{{{
   #}}}
 
 # Playlist {{{
+
 elif [[ $format =~ ^pl* ]];then
+
   # Getting playlist name {{{
   read -p "Enter the playlist name: " pldir 
   outdir=$outdir$pldir
