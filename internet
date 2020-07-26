@@ -1,5 +1,9 @@
 #!/bin/bash
 
+get_interface(){
+  interface=$( ip route | awk '/^default/ {print $5}' )
+}
+
 get_active(){ #{{{
   active=`nmcli -f name con show --active | sed '1d;s/\s*$//'`
   [[ -z "$active" ]] && active=None
@@ -16,9 +20,14 @@ get_wifi_name(){ #{{{
   local __wifi_name=$1
 
   read -p "Enter SrNO, r to refresh or q to quit: " srno
-  [[ -z $srno || ! $srno =~ [0-9]+ ]] && (echo $srno;echo "Sr no. is invalid")
-  [[ $srno == q ]] && (eval $__wifi_name="'q'"; return)
-  [[ $srno == r ]] && (eval $__wifi_name="'r'"; return)
+  if [[ $srno == q ]];then
+    eval $__wifi_name="'q'"
+    return 1
+  elif [[ $srno == r ]];then
+    eval $__wifi_name="'r'"
+    return 1
+  fi
+  [[ -z $srno || ! $srno =~ [0-9]+ ]] && (echo $srno;echo "Sr no. is invalid") || :
 
   local wifi_ssid=$(nmcli -t -f ssid dev wifi list)
   local __name=$(echo -e "$wifi_ssid" | sed -e "${srno}p;d")
@@ -60,12 +69,23 @@ connect_wifi(){ #{{{
 
     get_active
     if [[ "$active" == "$wifi_name" ]];then
-      echo "Successfully connected to $wifi_name"
+      local success_string="Successfully connected to $wifi_name"
+      echo $success_string
+      #notify-send "$(echo $success_string)"
+      notify-send "$success_string"
     else
       nmcli con del "$wifi_name" > /dev/null
     fi
     echo
   done
+} #}}}
+
+
+connect_lan(){ #{{{
+  nmcli dev disconnect $wifi_in
+  nmcli dev con $lan_in
+  get_interface
+  [[ $interface == $lan_in ]] && notify-send "Successfull connected to Ethernet" || :
 } #}}}
 
 lan_refresh(){ #{{{
@@ -80,6 +100,7 @@ wifi_refresh(){ #{{{
   sleep 2
   nmcli radio wifi on
 } #}}}
+
 
 # Setting Variables{{{
 get_active
@@ -105,7 +126,7 @@ elif [[ $1 == wifi ]];then
   nmcli radio wifi on
   # Sometimes the wifi gets connected to a network which is preconfigured, automatically
   get_active
-  if [[ "$active" == None ]];then
+  if [[ "$active" == None || "$interface" != "$wifi_in" ]];then
     connect_wifi
   else
     read -p "Wifi connected to $active. Change?[y/n] " choice
@@ -116,9 +137,7 @@ elif [[ $1 == lan ]];then
   # If the interface is enp3s0 then do nothing
   # If the no wifi active then do nothing
   # Or else disconnect with that wifi
-  [[ $interface == $lan_in ]] && exit 1
-    #[[ ! $iterface == enp3s0 ]] && $([[ -z "$active" || "$active" == None || "$active" == Wired ]] && nmcli con down "$active")
-    nmcli dev disconnect $wifi_in
-    nmcli dev con $lan_in
+  [[ $interface == $lan_in ]] && exit 1 || :
+  connect_lan
 fi
 #}}}
