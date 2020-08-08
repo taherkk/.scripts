@@ -1,8 +1,8 @@
 #!/bin/bash
 
-get_interface(){
+get_interface(){ #{{{
   interface=$( ip route | awk '/^default/ {print $5}' )
-}
+} #}}}
 
 get_active(){ #{{{
   active=`nmcli -f name con show --active | sed '1d;s/\s*$//'`
@@ -64,7 +64,7 @@ connect_wifi(){ #{{{
       # If the network is previously configured then activate the connection.
       nmcli --ask connection up "$wifi_name" > /dev/null
     else
-      nmcli --ask dev wifi connect "$wifi_name" > /dev/null
+      nmcli --ask dev wifi connect "$wifi_name"
     fi
 
     get_active
@@ -79,7 +79,6 @@ connect_wifi(){ #{{{
     echo
   done
 } #}}}
-
 
 connect_lan(){ #{{{
   nmcli dev disconnect $wifi_in
@@ -101,7 +100,6 @@ wifi_refresh(){ #{{{
   nmcli radio wifi on
 } #}}}
 
-
 # Setting Variables{{{
 get_active
 connections=$(nmcli -f name connection show | sed '1d')
@@ -114,15 +112,30 @@ wifi_in="wlp2s0"
 # Main {{{
 if [[ $1 == "" ]];then
   echo "$active"
+  exit 0
+fi
 
-elif [[ $1 == refresh ]];then
+# getopts {{{
+
+while getopts ":wlrd:" arg > /dev/null;do
+  case $arg in
+    w) wifi=1;;
+    l) lan=1;;
+    r) refresh=1;;
+    d) delete=$OPTARG;;
+  esac
+done
+
+#}}}
+
+if [[ $refresh == 1 ]];then
   if [[ $interface == $lan_in ]];then
     lan_refresh $interface
   elif [[ $interface == $wifi_in ]];then
     wifi_refresh
   fi
 
-elif [[ $1 == wifi ]];then
+elif [[ $wifi == 1 ]];then
   nmcli radio wifi on
   # Sometimes the wifi gets connected to a network which is preconfigured, automatically
   get_active
@@ -133,7 +146,7 @@ elif [[ $1 == wifi ]];then
     [[ $choice == y ]] && connect_wifi || :
   fi
 
-elif [[ $1 == lan ]];then
+elif [[ $lan == 1 ]];then
   # If the interface is enp3s0 then do nothing
   # If the no wifi active then do nothing
   # Or else disconnect with that wifi
