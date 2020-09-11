@@ -2,8 +2,8 @@
 
 option=$1
 filename=$2
-notesdir=~/Dropbox/NOTES/
-notelinkdir=~/Notes/
+notesdir=$HOME/Dropbox/NOTES/
+notelinkdir=$HOME/Notes/
 confirmation="I am sure I want to delete this note"
 
 getNote(){
@@ -12,12 +12,19 @@ getNote(){
 
 if [[ $option == -c || $option == create ]];then
 	touch $notesdir$filename
+	echo error
 	ln -s $notesdir$filename $notelinkdir
+	[[ -e $notesdir$filename ]] && echo hi
+	if [[ -e $notesdir$filename && -e $notelinkdir$filename ]];then
+		notify-send "Note $filename created"
+		st -e nvim $notelinkdir$filename &
+	fi
 elif [[ $option == -d || $option == delete ]];then
 	note=$(getNote)
 	if [[ ! -z $note ]];then
 		mv $notesdir$note ~/.trash/
 		rm $notelinkdir$note 
+		[[ ! -e $notesdir$note && ! -e $notelinkdir$note ]] && notify-send "Note $note deleted."
 	fi
 elif [[ $option == -o ]];then
 	note=$(getNote)

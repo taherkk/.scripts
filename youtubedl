@@ -7,13 +7,6 @@ url=""
 format=""
 options=""
 
-# Checking for the default directory
-[[ -d $outdir ]] && : || mkdir $outdir
-
-# Checking url correctness
-if [[ -z $url || $url != http* ]];then
-  echo "Invalid URL"
-
 #}}}
 
 # Arguments {{{
@@ -24,12 +17,24 @@ while getopts "d:u:f:o:" arg; do
     f) format=$OPTARG;; 
     o) options=$OPTARG;;
   esac
-  echo $OPTARG
 done
 #}}}
 
+# Checks {{{
+
+# Checking for the default directory
+[[ -d $outdir ]] && : || mkdir $outdir
+
+# Checking url correctness
+if [[ -z $url ]] && [[ $url =~ ^http* ]];then
+  echo "Invalid URL"
+  exit 1
+fi
+
+#}}}
+
 # Single file {{{
-elif [[ $format == vi ]];then #{{{
+if [[ $format == vi ]];then #{{{
   echo Getting media download options.
   choice=`youtube-dl -F --no-playlist $url | grep -E '\(best\)' | awk '{print $1}' | head -n 1`
   echo Code selected: $choice
