@@ -1,7 +1,7 @@
 #!/bin/bash
 
 option=$1
-filename=$2
+filename=$2.txt
 notesdir=$HOME/Dropbox/NOTES/
 notelinkdir=$HOME/Notes/
 confirmation="I am sure I want to delete this note"
@@ -10,7 +10,7 @@ getNote(){
 	echo "$(echo -e "$(ls $notelinkdir)" | dmenu -l 10 -p "Select Note: ")"
 }
 
-while getopts ":cdor" arg > /dev/null; do
+while getopts ":c:dor" arg > /dev/null; do
 	case $arg in
 		c)option=c;;
 		d)option=d;;
@@ -21,11 +21,9 @@ done
 
 if [[ $option == c || $option == create ]];then
 	touch $notesdir$filename
-	echo error
 	ln -s $notesdir$filename $notelinkdir
-	[[ -e $notesdir$filename ]] && echo hi
 	if [[ -e $notesdir$filename && -e $notelinkdir$filename ]];then
-		notify-send "Note $filename created"
+		notify-send "Note $filename created" 2> /dev/null
 		st -e nvim $notelinkdir$filename &
 	fi
 elif [[ $option == d || $option == delete ]];then
