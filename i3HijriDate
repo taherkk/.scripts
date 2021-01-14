@@ -53,7 +53,8 @@ class HijriDate:
             startMonth += 1
 
         # To add the days of the months between the starting and the ending years and months.
-        while (startYear <= endYear and startMonth < endMonth) or startYear < endYear:
+        while ((startYear <= endYear and startMonth < endMonth) or
+                startYear < endYear):
             days = days + self.gregMonthDays[startMonth]
             if(startMonth == 2 and self._isGregLeapYear(int(startYear))):
                 days = days+1
@@ -110,8 +111,8 @@ class HijriDate:
 
     def getHijriDate(self):
         hijri, hour = self._gregToHijri(self.refDate)
-        dateFormat = self.getHijriDay(
-            hijri, hour)+"  "+self.getHijriMonth(hijri['month'])+" "+self.getHijriYear(hijri['year'])+"هـ"
+        dateFormat = self.getHijriDay(hijri, hour)+"  " + self.getHijriMonth(
+            hijri['month'])+" " + self.getHijriYear(hijri['year'])+"هـ"
         return dateFormat
 
 # Formatting HijriDate {{{
@@ -127,7 +128,7 @@ class HijriDate:
                 day = hijri['day'] + 1
         else:
             day = hijri['day']
-        return self.convertNumbers(day)+"/"+self.convertNumbers(daysInMonth)
+        return self.convertNumbers(daysInMonth)+"/"+self.convertNumbers(day)
 
     def getHijriMonth(self, month):
         return self.convertMonth(month)[::-1]+"/"+self.convertNumbers(month)
