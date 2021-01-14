@@ -10,21 +10,15 @@ options=""
 #}}}
 
 # Arguments {{{
-while getopts ":avd:u:f:o:" arg; do
+while getopts "d:u:f:o:" arg; do
   case $arg in
-    a) audio=1;;
-    v) video=1;;
     d) outdir=$basedir$OPTARG;;
-    f) format=$OPTARG;;
     u) url=$OPTARG;;
+    f) format=$OPTARG;; 
     o) options=$OPTARG;;
   esac
 done
 #}}}
-
-downloadVideo(){
-  youtube-dl -f $choice $url $options --no-playlist -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
-}
 
 # Checks {{{
 

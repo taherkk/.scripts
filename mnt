@@ -1,6 +1,6 @@
 #!/bin/bash
 drives=$(lsblk -po "name,LABEL,FSTYPE,type,size,mountpoint")
-mountPath="/mnt/taher/"
+mountPath="/mnt/taher/
 echo "$drives"
 echo
 mount | grep /mnt | awk '{ print $1" "$3 }'
