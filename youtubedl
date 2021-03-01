@@ -22,11 +22,11 @@ done
 #}}}
 
 download(){
-  youtube-dl -f $1 $url $2 -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  youtube-dl -f $1 $url $options -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 }
 
 downloadPlaylist(){
-  youtube-dl -f $1 $url $3 --yes-playlist -c -o "$outdir/%(playlist_index)0$( echo $2 )d-%(playlist_title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  youtube-dl -f $1 $url $options --yes-playlist -i-c -o "$outdir/%(playlist_index)0$( echo $2 )d-%(playlist_title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 }
 
 # Checks {{{
@@ -57,13 +57,15 @@ elif [[ $format == au ]];then
 elif [[ $format =~ ^pl* ]];then
 
   # Getting playlist name {{{
-  read -p "Enter the playlist name: " pldir 
+	flat_playlist=$( youtube-dl --flat-playlist $url )
+	playlist_name=$( echo "$flat_playlist" | grep "\[download\] Downloading playlist")
+	echo Downloading playlist: $playlist_name
   outdir=$outdir$pldir
   [[ ! -d $outdir ]] && mkdir $outdir
-  [[ -d $outdir ]] && echo "outdir = $outdir"
+  [[ -d $outdir ]] && echo "Download directory = $outdir"
   #}}}
   
-  count=$(( $(youtube-dl --flat-playlist $url | wc -l) - 4 ))
+  count=$(( $( echo "$flat_playlist" | wc -l) - 4 ))
   padding=${#count}
   
   # Choosing audio or video {{{
@@ -83,6 +85,6 @@ else
   echo hello
   youtube-dl -F $url
   read -p "Enter your choice: " choice
-  youtube-dl -f $choice $url $options -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  youtube-dl -f $choice $url -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 fi
 #}}}
