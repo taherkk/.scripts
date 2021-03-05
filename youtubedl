@@ -26,7 +26,7 @@ download(){
 }
 
 downloadPlaylist(){
-  youtube-dl -f $1 $url $options --yes-playlist -i-c -o "$outdir/%(playlist_index)0$( echo $2 )d-%(playlist_title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  youtube-dl -f $1 $url $options --yes-playlist -i -c -o "$outdir/%(playlist_index)0$( echo $2 )d-%(playlist_title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 }
 
 # Checks {{{
