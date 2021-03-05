@@ -58,9 +58,9 @@ elif [[ $format =~ ^pl* ]];then
 
   # Getting playlist name {{{
 	flat_playlist=$( youtube-dl --flat-playlist $url )
-	playlist_name=$( echo "$flat_playlist" | grep "\[download\] Downloading playlist")
+  playlist_name=$( echo "$flat_playlist" | grep "\[download\] Downloading playlist" | sed -r 's/\[download\] Downloading playlist: (.*)/\1/' | tr " " "_" )
 	echo Downloading playlist: $playlist_name
-  outdir=$outdir$pldir
+  outdir=$outdir/$playlist_name
   [[ ! -d $outdir ]] && mkdir $outdir
   [[ -d $outdir ]] && echo "Download directory = $outdir"
   #}}}
