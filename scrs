@@ -1,7 +1,7 @@
 #!/bin/bash
 
 screenshot(){
-  scrot $@ -e 'mv $f ~/Pictures/screenshots'
+  scrot $@ -e 'xclip $f -t image/png -selection clipboard; mv $f ~/Pictures/screenshots/'
 }
 
 [[ -z $1 ]] && choice=$(echo -e "Fullscreen\nWindow\nSelect" | dmenu -p "Select choice:" )
