@@ -26,7 +26,7 @@ download(){
 }
 
 downloadPlaylist(){
-  youtube-dl -f $1 $url $options --yes-playlist -i -c -o "$outdir/%(playlist_index)0$( echo $2 )d-%(playlist_title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  youtube-dl -f $1 $url $options --yes-playlist --write-sub --sub-lang en -i -c -o "$outdir/%(playlist_index)0$( echo $2 )d-%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 }
 
 # Checks {{{
@@ -60,7 +60,7 @@ elif [[ $format =~ ^pl* ]];then
 	flat_playlist=$( youtube-dl --flat-playlist $url )
   playlist_name=$( echo "$flat_playlist" | grep "\[download\] Downloading playlist" | sed -r 's/\[download\] Downloading playlist: (.*)/\1/' | tr " " "_" )
 	echo Downloading playlist: $playlist_name
-  outdir=$outdir/$playlist_name
+  outdir=$outdir$playlist_name
   [[ ! -d $outdir ]] && mkdir $outdir
   [[ -d $outdir ]] && echo "Download directory = $outdir"
   #}}}

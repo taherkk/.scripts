@@ -1,7 +1,5 @@
 #!/bin/bash
 
-option=$1
-filename=$2.txt
 notesdir=$HOME/Dropbox/NOTES/
 notelinkdir=$HOME/Notes/
 confirmation="I am sure I want to delete this note"
@@ -10,11 +8,11 @@ getNote(){
 	echo "$(echo -e "$(ls $notelinkdir)" | dmenu -l 10 -p "Select Note: ")"
 }
 
-while getopts ":c:dor" arg > /dev/null; do
+while getopts ":c:dor:" arg > /dev/null; do
 	case $arg in
-		c)option=c;;
+		c)option=c;filename=$OPTARG;;
 		d)option=d;;
-		r)option=r;;
+		r)option=r;filename=$OPTARG;;
 		o)option=o;;
 	esac
 done
@@ -36,4 +34,9 @@ elif [[ $option == d || $option == delete ]];then
 elif [[ $option == o ]];then
 	note=$(getNote)
 	[[ ! -z $note ]] && st -e nvim "$notelinkdir$note"
+elif [[ $option == r ]]; then
+	read -p "Enter new filename" newfilename
+	mv $notesdir$filename $notesdir$newfilename
+	rm $notelinkdir$filename
+	ln -s $notesdir$newfilename $notelinkdir
 fi

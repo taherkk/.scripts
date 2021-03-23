@@ -1,2 +1,2 @@
 xmodmap ~/.cache/.Xmodmap
-xset r rate 150 35
+xset r rate 150 40
