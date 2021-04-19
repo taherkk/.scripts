@@ -9,10 +9,6 @@ get_active(){ #{{{
   [[ -z "$active" ]] && active=None
 } #}}}
 
-get_connections(){ #{{{
-  connections=$(nmcli -f name connection show | sed '1d')
-} #}}}
-
 get_wifi_list(){ #{{{
   list=$(nmcli -f IN-USE,ssid,mode,chan,rate,signal device wifi list)
   printf "SrNo\t$(echo "$list" | sed '1p;d')\n"
@@ -64,7 +60,6 @@ connect_wifi(){ #{{{
     [[ $wifi_name == q ]] && exit
     [[ $wifi_name == r || $wifi_name == "" ]] && continue
     echo Selected network: "$wifi_name"
-    echo Connection Name: "$con_name"
 
     get_active
     if [[ $active == $wifi_name ]];then
@@ -73,16 +68,16 @@ connect_wifi(){ #{{{
     fi
 
     # To check if a connection is already configured or not
-    get_connections
-    if [[ ! -z "$( echo "$connections" | grep -e "$wifi_name" )" ]];then
+    get_con_name $wifi_name con_name
+    if  [[ ! -z $con_name ]];then
+      echo Connecting to connection: "$con_name"
       # If the wifi is connected to any network by default it needs to close that connection
       get_active
       [[ "$active" == None ]] && : ||  $(nmcli connection down "$active" > /dev/null)
-    get_con_name $wifi_name con_name
-    echo $con_name
       # If the network is previously configured then activate the connection.
       nmcli --ask connection up "$con_name" > /dev/null
     else
+      echo "Connection does not exist. Creating connection."
       nmcli --ask dev wifi connect "$wifi_name"
     fi
 
@@ -121,8 +116,6 @@ wifi_refresh(){ #{{{
 
 # Setting Variables{{{
 get_active
-#connections=$(nmcli -f name connection show | sed '1d')
-get_connections
 # getting the interface (wifi/lan) which is active at the moment
 interface=$( ip route | awk '/^default/ {print $5}' )
 lan_in="enp3s0"
