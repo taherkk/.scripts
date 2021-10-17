@@ -4,6 +4,9 @@ notesdir=$HOME/Dropbox/NOTES/
 notelinkdir=$HOME/Notes/
 confirmation="I am sure I want to delete this note"
 
+[[ -d $notelinkdir ]] && : || mkdir -p $notelinkdir
+[[ -d $notesdir ]] && : || mkdir -p $notesdir
+
 getNote(){
 	echo "$(echo -e "$(ls $notelinkdir)" | dmenu -l 10 -p "Select Note: ")"
 }
@@ -22,7 +25,7 @@ if [[ $option == c || $option == create ]];then
 	ln -s $notesdir$filename $notelinkdir
 	if [[ -e $notesdir$filename && -e $notelinkdir$filename ]];then
 		notify-send "Note $filename created" 2> /dev/null
-		st -e nvim $notelinkdir$filename &
+		$TERMINAL -e nvim $notelinkdir$filename &
 	fi
 elif [[ $option == d || $option == delete ]];then
 	note=$(getNote)
@@ -33,7 +36,7 @@ elif [[ $option == d || $option == delete ]];then
 	fi
 elif [[ $option == o ]];then
 	note=$(getNote)
-	[[ ! -z $note ]] && st -e nvim "$notelinkdir$note"
+	[[ ! -z $note ]] && $TERMINAL -e nvim "$notelinkdir$note"
 elif [[ $option == r ]]; then
 	read -p "Enter new filename" newfilename
 	mv $notesdir$filename $notesdir$newfilename

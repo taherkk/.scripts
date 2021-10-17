@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # initializing variables {{{
-multiply_factor=88
-current_brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
-max_brightness=$(cat /sys/class/backlight/intel_backlight/max_brightness)
+multiply_factor=3
+current_brightness=$(cat /sys/class/backlight/amdgpu_bl0/brightness)
+max_brightness=$(cat /sys/class/backlight/amdgpu_bl0/max_brightness)
 current_level=$(( $current_brightness / $multiply_factor ))
 max_level=$(($max_brightness / $multiply_factor))
 brightness=0
@@ -11,7 +11,7 @@ brightness=0
 
 set_brightness() { #{{{
   # To check if brightness is not equal to zero or greater than maximum limit
-  [[ $1 -gt 0 && $1 -le $max_brightness ]] && echo "$1" > /sys/class/backlight/intel_backlight/brightness || echo Brightness too low.
+  [[ $1 -gt 0 && $1 -le $max_brightness ]] && echo "$1" > /sys/class/backlight/amdgpu_bl0/brightness || echo Brightness too low.
   pkill -RTMIN+11 i3blocks
 } #}}}
 
@@ -42,6 +42,6 @@ elif [[ $1 =~ -?[0-9]+ ]];then
   fi
   set_brightness $brightness
 else
-  echo Current brightness: $(cat /sys/class/backlight/intel_backlight/brightness)
+  echo Current brightness: $(cat /sys/class/backlight/amdgpu_bl0/brightness)
   echo 'Current level : ' $current_level
 fi

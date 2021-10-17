@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NUM=`cat /sys/class/power_supply/BAT0/capacity` || exit
-STATUS=`cat /sys/class/power_supply/BAT0/status|sed 's/.//2g'`
+NUM=`cat /sys/class/power_supply/BAT1/capacity` || exit
+STATUS=`cat /sys/class/power_supply/BAT1/status|sed 's/.//2g'`
 [[ $STATUS == C ]] && STATUS=🔌 || STATUS=🔋
 
 if [[ $NUM -ge 100 ]];then
