@@ -5,11 +5,11 @@ STATUS=`cat /sys/class/power_supply/BAT1/status|sed 's/.//2g'`
 [[ $STATUS == C ]] && STATUS=🔌 || STATUS=🔋
 
 if [[ $NUM -ge 100 ]];then
-  echo $STATUS: "100"%
-  echo $STATUS: "100"%
+  echo $STATUS "100"%
+  echo $STATUS "100"%
 else
-  echo $STATUS: "$NUM"%
-  echo $STATUS: "$NUM"%
+  echo $STATUS "$NUM"%
+  echo $STATUS "$NUM"%
 fi
   
 if [ "$NUM" -ge 80 ]; then

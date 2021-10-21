@@ -1,5 +1,8 @@
 #!/bin/bash
 
+scr_dir="$HOME/Pictures/screenshots"
+! [[ -d $scr_dir ]] && mkdir -p $scr_dir
+
 screenshot(){
   scrot $@ -e 'xclip $f -t image/png -selection clipboard; mv $f ~/Pictures/screenshots/'
 }
