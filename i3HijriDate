@@ -111,8 +111,8 @@ class HijriDate:
 
     def getHijriDate(self):
         hijri, hour = self._gregToHijri(self.refDate)
-        dateFormat = self.getHijriDay(hijri, hour)+"  " + self.getHijriMonth(
-            hijri['month'])+" " + self.getHijriYear(hijri['year'])+"هـ"
+        dateFormat = self.getHijriDay(hijri, hour)+" " + self.getHijriMonth(
+            hijri['month'])+"  " + self.getHijriYear(hijri['year'])+"هـ"
         return dateFormat
 
 # Formatting HijriDate {{{
