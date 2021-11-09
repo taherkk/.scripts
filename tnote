@@ -1,14 +1,12 @@
 #!/bin/bash
 
 notesdir=$HOME/Dropbox/NOTES/
-notelinkdir=$HOME/Notes/
 confirmation="I am sure I want to delete this note"
 
-[[ -d $notelinkdir ]] && : || mkdir -p $notelinkdir
 [[ -d $notesdir ]] && : || mkdir -p $notesdir
 
 getNote(){
-	echo "$(echo -e "$(ls $notelinkdir)" | dmenu -l 10 -p "Select Note: ")"
+	echo "$(echo -e "$(ls $notesdir)" | dmenu -l 10 -p "Select Note: ")"
 }
 
 while getopts ":c:dor:" arg > /dev/null; do
@@ -22,24 +20,20 @@ done
 
 if [[ $option == c || $option == create ]];then
 	touch $notesdir$filename
-	ln -s $notesdir$filename $notelinkdir
-	if [[ -e $notesdir$filename && -e $notelinkdir$filename ]];then
+	if [[ -e $notesdir$filename && -e $notesdir$filename ]];then
 		notify-send "Note $filename created" 2> /dev/null
-		$TERMINAL -e nvim $notelinkdir$filename &
+		$TERMINAL -e nvim $notesdir$filename &
 	fi
 elif [[ $option == d || $option == delete ]];then
 	note=$(getNote)
 	if [[ ! -z $note ]];then
 		mv $notesdir$note ~/.trash/
-		rm $notelinkdir$note 
-		[[ ! -e $notesdir$note && ! -e $notelinkdir$note ]] && notify-send "Note $note deleted."
+		[[ ! -e $notesdir$note ]] && notify-send "Note $note deleted."
 	fi
 elif [[ $option == o ]];then
 	note=$(getNote)
-	[[ ! -z $note ]] && $TERMINAL -e nvim "$notelinkdir$note"
+	[[ ! -z $note ]] && $TERMINAL -e nvim "$notesdir$note"
 elif [[ $option == r ]]; then
 	read -p "Enter new filename" newfilename
 	mv $notesdir$filename $notesdir$newfilename
-	rm $notelinkdir$filename
-	ln -s $notesdir$newfilename $notelinkdir
 fi

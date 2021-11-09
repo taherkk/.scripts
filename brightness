@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # initializing variables {{{
-multiply_factor=3
+multiply_factor=8
 current_brightness=$(cat /sys/class/backlight/amdgpu_bl0/brightness)
 max_brightness=$(cat /sys/class/backlight/amdgpu_bl0/max_brightness)
 current_level=$(( $current_brightness / $multiply_factor ))

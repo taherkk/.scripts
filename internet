@@ -1,22 +1,22 @@
 #!/bin/bash
 
-get_interface(){ #{{{
+get_interface(){
   interface=$( ip route | awk '/^default/ {print $5}' )
-} #}}}
+}
 
-get_active(){ #{{{
+get_active(){
   active=`nmcli -f name con show --active | sed '1d;s/\s*$//'`
   [[ -z "$active" ]] && active=None
-} #}}}
+}
 
-get_wifi_list(){ #{{{
+get_wifi_list(){
   list=$(nmcli -f IN-USE,ssid,mode,chan,rate,signal device wifi list)
   printf "SrNo\t$(echo "$list" | sed '1p;d')\n"
   wifi_list_show=$(echo "$list" | sed '1d' | awk '{print ++i")" "\t" $0}')
   echo "$wifi_list_show"
-} #}}}
+}
 
-get_wifi_name(){ #{{{
+get_wifi_name(){
   local __wifi_name=$1
 
   read -p "Enter SrNO, r to refresh or q to quit: " srno
@@ -38,14 +38,15 @@ get_wifi_name(){ #{{{
   else
     eval $__wifi_name="'$__name'"
   fi
-} #}}}
+}
 
-get_con_name(){ #{{{
+get_con_name(){
   con_name=`nmcli -f name con show | grep $1 | sed 's/\s*$//'`
-  eval $2=\"$con_name\"
-} #}}}
+  eval "$2=\"$con_name\""
+}
 
-connect_wifi(){ #{{{
+connect_wifi(){
+  get_con_name $wifi_name con_name
   # To check if the wifi is connected to the desired network or no network at all
   while [[ "$active" != "$wifi_name" || "$active" == None ]]; do
     # To scan for new networks in case of a rescan
@@ -68,7 +69,6 @@ connect_wifi(){ #{{{
     fi
 
     # To check if a connection is already configured or not
-    get_con_name $wifi_name con_name
     if  [[ ! -z $con_name ]];then
       echo Connecting to connection: "$con_name"
       # If the wifi is connected to any network by default it needs to close that connection
@@ -92,29 +92,29 @@ connect_wifi(){ #{{{
     fi
     echo
   done
-} #}}}
+}
 
-connect_lan(){ #{{{
+connect_lan(){
   nmcli dev disconnect $wifi_in
   nmcli dev con $lan_in
   get_interface
   [[ $interface == $lan_in ]] && notify-send "Successfull connected to Ethernet" || :
-} #}}}
+}
 
-lan_refresh(){ #{{{
+lan_refresh(){
   sudo ip link set $1 down
   sleep 2
   sudo ip link set $1 up
-} #}}}
+}
 
-wifi_refresh(){ #{{{
+wifi_refresh(){
   get_active
   nmcli radio wifi off
   sleep 2
   nmcli radio wifi on
 } #}}}
 
-# Setting Variables{{{
+# Setting Variables
 get_active
 # getting the interface (wifi/lan) which is active at the moment
 interface=$( ip route | awk '/^default/ {print $5}' )
@@ -122,13 +122,11 @@ lan_in="enp3s0"
 wifi_in="wlp2s0"
 #}}}
 
-# Main {{{
+# Main
 if [[ $1 == "" ]];then
   echo "$active"
   exit 0
 fi
-
-# getopts {{{
 
 while getopts ":wlrd:" arg > /dev/null;do
   case $arg in
@@ -138,8 +136,6 @@ while getopts ":wlrd:" arg > /dev/null;do
     d) delete=$OPTARG;;
   esac
 done
-
-#}}}
 
 if [[ $refresh == 1 ]];then
   if [[ $interface == $lan_in ]];then
@@ -166,4 +162,3 @@ elif [[ $lan == 1 ]];then
   [[ $interface == $lan_in ]] && exit 1 || :
   connect_lan
 fi
-#}}}
