@@ -128,7 +128,7 @@ class HijriDate:
                 day = hijri['day'] + 1
         else:
             day = hijri['day']
-        return self.convertNumbers(daysInMonth)+"/"+self.convertNumbers(day)
+        return self.convertNumbers(day)+"/"+self.convertNumbers(daysInMonth)
 
     def getHijriMonth(self, month):
         return self.convertMonth(month)[::-1]+"/"+self.convertNumbers(month)
