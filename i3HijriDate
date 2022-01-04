@@ -9,7 +9,7 @@ class HijriDate:
     def __str__(self):
         print("Calculates Hijri Date for Dawoodi Bohra using Gregorian date in Arabic")
 
-    def __init__(self):
+    def __init__(self,curGregDate):
 
         self.gregMonthDays = [0, 31, 28, 31,
                               30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -17,6 +17,7 @@ class HijriDate:
 
         self.refDate = {'gregorian': {'day': 27, 'month': 3, 'year': 2020}, 'hijri': {
             'day': 3, 'month': 8, 'year': 1441}}
+        self.curGregDate = curGregDate
 
     def _isGregLeapYear(self, year):
         if (year % 4 == 0 and year % 100 > 0) or year % 400 == 0:
@@ -29,7 +30,7 @@ class HijriDate:
             return False
         return True
 
-    def _getNumberOfGregDays(self, refGregDate, curGregDate):
+    def _getNumberOfGregDays(self, refGregDate):
         '''Calculating the number of days from the reference date till current date'''
 
         startMonth = refGregDate['month']
@@ -38,18 +39,20 @@ class HijriDate:
         endYear = curGregDate['year']
         days = 0
 
-        if (startYear <= endYear and startMonth <= endMonth):
+        if startYear <= endYear:
             # Adding the remaining days of the month of the reference date
             if(startYear == endYear and startMonth == endMonth):
                 return curGregDate['day'] - refGregDate['day']
-            else:
+            elif startYear < endYear:
                 # For the different years and different months
                 days = self.gregMonthDays[refGregDate['month']
                                           ]-refGregDate['day']
+            #print(f"rest days of reference month {days}")
 
             # Adding days of the current month
             if startMonth != endMonth or (startMonth == endMonth and startYear < endYear):
                 days = days + curGregDate['day']
+                #print(f"Adding days passed of current month {days}")
             startMonth += 1
 
         # To add the days of the months between the starting and the ending years and months.
@@ -97,15 +100,9 @@ class HijriDate:
         return {'day': day, 'month': month, 'year': year}
 
     def _gregToHijri(self, refdate):
-        curDate = datetime.datetime.now()
-        curGregDate = {
-            'day': curDate.day,
-            'month': curDate.month,
-            'year': curDate.year
-        }
         refGregDate = refdate['gregorian']
         refHijriDate = refdate['hijri']
-        gregDays = self._getNumberOfGregDays(refGregDate, curGregDate)
+        gregDays = self._getNumberOfGregDays(refGregDate)
         curHijriDate = self._calHijri(refHijriDate, gregDays)
         return (curHijriDate, curDate.hour)
 
@@ -183,6 +180,17 @@ class HijriDate:
 # }}}
 
 
-hijriDate = HijriDate()
+curDate = datetime.datetime.now()
+curGregDate = {
+    'day': curDate.day,
+    'month': curDate.month,
+    'year': curDate.year
+}
+#curGregDate = {
+#    'day': 1,
+#    'month': 1,
+#    'year': 2022
+#}
+hijriDate = HijriDate(curGregDate)
 
 print(hijriDate.getHijriDate())
