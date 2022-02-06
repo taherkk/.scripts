@@ -6,12 +6,11 @@ echo
 mount | grep /mnt | awk '{ print $1" "$3 }'
 read -p "Enter disk to be mounted: " disk
 echo
-label=$( echo "$drives" | grep $disk | awk '{print $2}')
-echo "label=$label"
+label=$( blkid | grep $disk | grep -Eo "LABEL=\"[a-zA-Z0-9_-]+*\"" | sed -r 's/LABEL=\"(.*?)\"/\1/' )
 if [[ $label == "" ]]; then
-  read -p "Enter the folder in /mnt: " folder
+  read -p "Label not set. Please enter the folder name: " folder
   sudo mount /dev/$disk $mountPath$folder
-  echo drive $disk mounted on $folder
+  echo drive $disk mounted on $mountPath$folder
 else
   [[ -d $mountPath$label ]] && : || mkdir $mountPath$label
   sudo mount /dev/$disk $mountPath$label

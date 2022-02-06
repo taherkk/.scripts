@@ -41,8 +41,8 @@ get_wifi_name(){
 }
 
 get_con_name(){
-  con_name=`nmcli -f name con show | grep $1 | sed 's/\s*$//'`
-  eval "$2=\"$con_name\""
+  con_name=$(nmcli -f name con show | grep $1 | sed 's/\s*$//')
+  [[ ! -z $con_name ]] && eval "$2=\"$con_name\"" || return 1
 }
 
 connect_wifi(){
@@ -69,7 +69,7 @@ connect_wifi(){
     fi
 
     # To check if a connection is already configured or not
-    if  [[ ! -z $con_name ]];then
+    if  [[ $con_name > 0 ]];then
       echo Connecting to connection: "$con_name"
       # If the wifi is connected to any network by default it needs to close that connection
       get_active
