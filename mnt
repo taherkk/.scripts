@@ -1,6 +1,8 @@
 #!/bin/bash
+set -e
 drives=$(lsblk -po "name,LABEL,FSTYPE,type,size,mountpoint")
-mountPath="/mnt/taher/"
+mountPath="/home/`whoami`/mnt/"
+[[ -d $mountPath ]] && : || mkdir $mountPath
 echo "$drives"
 echo
 mount | grep /mnt | awk '{ print $1" "$3 }'
@@ -9,10 +11,11 @@ echo
 label=$( blkid | grep $disk | grep -Eo "LABEL=\"[a-zA-Z0-9_-]+*\"" | sed -r 's/LABEL=\"(.*?)\"/\1/' )
 if [[ $label == "" ]]; then
   read -p "Label not set. Please enter the folder name: " folder
-  sudo mount /dev/$disk $mountPath$folder
+  [[ -d $mountPath$folder ]] && : || sudo mkdir $mountPath$folder
+  sudo mount /dev/$disk $mountPath$folder -o umask=000
   echo drive $disk mounted on $mountPath$folder
 else
   [[ -d $mountPath$label ]] && : || mkdir $mountPath$label
-  sudo mount /dev/$disk $mountPath$label
+  sudo mount /dev/$disk $mountPath$label -o umask=000
   echo Drive $disk with label $label mounted on $mountPath$label
 fi

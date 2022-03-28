@@ -5,7 +5,7 @@ get_interface(){
 }
 
 get_active(){
-  active=`nmcli -f name con show --active | sed '1d;s/\s*$//'`
+  active=`nmcli -f name con show --active | sed '1d;s/\s*$//;q'`
   [[ -z "$active" ]] && active=None
 }
 
@@ -41,12 +41,11 @@ get_wifi_name(){
 }
 
 get_con_name(){
-  con_name=$(nmcli -f name con show | grep $1 | sed 's/\s*$//')
-  [[ ! -z $con_name ]] && eval "$2=\"$con_name\"" || return 1
+  con=$(nmcli -f name con show | grep "$1" | sed 's/\s*$//;q')
+  [[ ! -z $con ]] && eval "$2=\"$con\"" || return 1
 }
 
 connect_wifi(){
-  get_con_name $wifi_name con_name
   # To check if the wifi is connected to the desired network or no network at all
   while [[ "$active" != "$wifi_name" || "$active" == None ]]; do
     # To scan for new networks in case of a rescan
@@ -69,6 +68,7 @@ connect_wifi(){
     fi
 
     # To check if a connection is already configured or not
+    get_con_name "$wifi_name" con_name
     if  [[ $con_name > 0 ]];then
       echo Connecting to connection: "$con_name"
       # If the wifi is connected to any network by default it needs to close that connection

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-options="-d $HOME/torrents --seed-time=0 --bt-max-peers=0 --bt-detach-seed-only --max-overall-upload-limit=20K  --max-upload-limit=5K"
+downloadDir="$HOME/torrents"
+options="-d $downloadDir --seed-time=0 --bt-max-peers=0 --bt-detach-seed-only --max-overall-upload-limit=20K  --max-upload-limit=5K"
 
 [[ -d $HOME/torrents ]] && : || mkdir ~/torrents ]]
 if [[ $1 == '' ]];then
@@ -10,9 +11,9 @@ elif [[ "$1" == *.torrent ]];then
   aria2c -c $1 $options
   [[ -f $(ls ~/Downloads/*.torrent) ]] && rm -i ~/Downloads/*.torrent
 elif [[ $1 =~ magnet* ]];then
-  aria2c $1 -c -j 3 -x 16 -s 20 -k 1M $1
+  aria2c $1 -c -j 3 -x 16 -s 20 -k 1M $options $1
 elif [[ "$1" == http* || "$1" == https* ]];then
-  aria2c -c -j 3 -x 16 -s 20 -k 1M $1
+  aria2c -c -j 3 -x 16 -s 20 -k 1M $1 -d $downloadDir
 else
   echo "Invalid Argument"
 fi

@@ -6,7 +6,7 @@ outdir=$basedir
 url=""
 format=""
 options=""
-videoFormat="\'best[ext=mp4]/best\'"
+videoFormat="\'best/best\'"
 audioFormat="\'bestaudio[ext=m4a]/bestaudio\'"
 #}}}
 
