@@ -46,7 +46,7 @@ class HijriDate:
             elif startYear < endYear:
                 # For the different years and different months
                 days = self.gregMonthDays[refGregDate['month']
-                                          ] - refGregDate['day']
+                                          ] - refGregDate['day'] + 1
             #print(f"rest days of reference month {days}")
 
             # Adding days of the current month
@@ -184,9 +184,9 @@ curGregDate = {
     'year': curDate.year
 }
 # curGregDate = {
-#    'day': 15,
-#    'month': 12,
-#    'year': 2020
+#    'day': 5,
+#    'month': 4,
+#    'year': 2022
 # }
 hijriDate = HijriDate(curGregDate)
 

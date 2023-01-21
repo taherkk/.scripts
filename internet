@@ -119,7 +119,7 @@ get_active
 # getting the interface (wifi/lan) which is active at the moment
 interface=$( ip route | awk '/^default/ {print $5}' )
 lan_in="enp3s0"
-wifi_in="wlp2s0"
+wifi_in="wlp1s0"
 #}}}
 
 # Main
