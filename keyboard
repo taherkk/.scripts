@@ -1,2 +1,4 @@
+setxkbmap -option caps:escape
 xmodmap ~/.config/Xmodmap
+
 xset r rate 150 40
