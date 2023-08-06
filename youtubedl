@@ -22,11 +22,11 @@ done
 #}}}
 
 download(){
-  youtube-dl -f $1 $url $options -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  yt-dlp -f $1 $url $options -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 }
 
 downloadPlaylist(){
-  youtube-dl -f $1 $url $options --yes-playlist --write-sub --sub-lang en -i -c -o "$outdir/%(playlist_index)0$( echo $2 )d-%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  yt-dlp -f $1 $url $options --yes-playlist --write-sub --sub-lang en -i -c -o "$outdir/%(playlist_index)0$( echo $2 )d-%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 }
 
 # Checks {{{
@@ -57,7 +57,7 @@ elif [[ $format == au ]];then
 elif [[ $format =~ ^pl* ]];then
 
   # Getting playlist name {{{
-	flat_playlist=$( youtube-dl --flat-playlist $url )
+	flat_playlist=$( yt-dlp --flat-playlist $url )
   playlist_name=$( echo "$flat_playlist" | grep "\[download\] Downloading playlist" | sed -r 's/\[download\] Downloading playlist: (.*)/\1/' | tr " " "_" )
 	echo Downloading playlist: $playlist_name
   outdir=$outdir$playlist_name
@@ -83,8 +83,8 @@ elif [[ $format =~ ^pl* ]];then
   # Custom choice {{{
 else
   echo hello
-  youtube-dl -F $url
+  yt-dlp -F $url
   read -p "Enter your choice: " choice
-  youtube-dl -f $choice $url -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
+  yt-dlp -f $choice $url -c -o "$outdir/%(title)s.%(ext)s" --external-downloader aria2c --external-downloader-args '-c -j 3 -x 16 -s 20 -k 1M'
 fi
 #}}}
